@@ -123,8 +123,8 @@ export const VENUES_DB: VenueDB[] = [
 ]
 
 // Utilidades
-export const CITIES = [...new Set(VENUES_DB.map(v => v.city))].sort()
-export const COUNTRIES = [...new Set(VENUES_DB.map(v => v.country))].sort()
+export const CITIES = Array.from(new Set(VENUES_DB.map(v => v.city))).sort()
+export const COUNTRIES = Array.from(new Set(VENUES_DB.map(v => v.country))).sort()
 
 export function getVenuesByCity(city: string): VenueDB[] {
   return VENUES_DB.filter(v => v.city === city)

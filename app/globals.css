@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #b8f75b;
+  --accent2: #7c5ff5;
+  --text: #f0f0f0;
+  --muted: #888;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Custom components */
+@layer components {
+  .card {
+    @apply bg-surface border border-white/[0.08] rounded-2xl p-5;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-bg font-medium px-4 py-2 rounded-lg text-sm transition-opacity hover:opacity-90 cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply bg-surface2 text-white border border-white/[0.08] font-medium px-4 py-2 rounded-lg text-sm transition-colors hover:border-white/20 cursor-pointer;
+  }
+
+  .btn-accent2 {
+    @apply bg-accent2 text-white font-medium px-4 py-2 rounded-lg text-sm cursor-pointer;
+  }
+
+  .form-input {
+    @apply w-full bg-surface2 border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm outline-none transition-colors focus:border-accent2 placeholder:text-[#888];
+  }
+
+  .form-label {
+    @apply text-xs text-[#888] mb-1 block;
+  }
+
+  .badge-confirmed {
+    @apply text-accent bg-accent/10 text-xs px-2.5 py-1 rounded-full font-medium;
+  }
+
+  .badge-pending {
+    @apply text-yellow-400 bg-yellow-400/10 text-xs px-2.5 py-1 rounded-full font-medium;
+  }
+
+  .badge-completed {
+    @apply text-[#888] bg-white/5 text-xs px-2.5 py-1 rounded-full font-medium;
+  }
+
+  .badge-cancelled {
+    @apply text-red-400 bg-red-400/10 text-xs px-2.5 py-1 rounded-full font-medium;
+  }
+
+  .page-title {
+    @apply font-display text-2xl font-extrabold tracking-tight text-white;
+  }
+
+  .page-sub {
+    @apply text-[#888] text-sm mt-1 mb-6;
+  }
+
+  .section-title {
+    @apply text-sm font-medium text-white mb-3;
+  }
+
+  .stat-value {
+    @apply font-display text-3xl font-extrabold text-accent;
+  }
+
+  .stat-label {
+    @apply text-xs text-[#888] mt-1;
+  }
+
+  .generated-content {
+    @apply bg-surface2 border border-white/[0.08] rounded-xl p-4 text-sm leading-relaxed text-white whitespace-pre-wrap min-h-[80px];
+  }
+}

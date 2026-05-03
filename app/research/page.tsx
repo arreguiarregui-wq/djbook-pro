@@ -1,253 +1,254 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import AppLayout from '@/components/layout/AppLayout'
-import type { VenueResearch } from '@/types'
+import { VENUES_DB, CITIES, VENUE_STATS, type VenueDB } from '@/lib/venues-db'
 
-const QUICK_SEARCHES = [
-  { name: 'Fabric', city: 'Londres', genre: 'Techno' },
-  { name: 'Berghain', city: 'Berlín', genre: 'Techno' },
-  { name: 'Fabrik', city: 'Madrid', genre: 'Techno' },
-  { name: 'DC-10', city: 'Ibiza', genre: 'House' },
-  { name: 'Tresor', city: 'Berlín', genre: 'Techno' },
-  { name: 'Razzmatazz', city: 'Barcelona', genre: 'Mixed' },
+const GENRES = ['Techno', 'House', 'Drum & Bass', 'Experimental', 'Disco', 'Mixed']
+const TYPES = [
+  { value: '', label: 'Todos' },
+  { value: 'club', label: 'Clubs' },
+  { value: 'bar', label: 'Bares' },
+  { value: 'festival', label: 'Festivales' },
+]
+const ENTRADA_TIPOS = [
+  { value: '', label: 'Cualquier precio' },
+  { value: 'free', label: 'Gratis' },
+  { value: 'low', label: 'Económico' },
+  { value: 'mid', label: 'Medio' },
+  { value: 'high', label: 'Premium' },
 ]
 
+const ENTRADA_COLORS: Record<string, string> = {
+  free: 'bg-green-500/10 text-green-400',
+  low: 'bg-blue-500/10 text-blue-400',
+  mid: 'bg-amber-500/10 text-amber-400',
+  high: 'bg-red-500/10 text-red-400',
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  club: '#7c5ff5',
+  bar: '#1d9e75',
+  festival: '#e8a020',
+}
+
 export default function ResearchPage() {
-  const [venueName, setVenueName] = useState('')
-  const [venueCity, setVenueCity] = useState('')
-  const [venueGenre, setVenueGenre] = useState('Techno')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<VenueResearch | null>(null)
+  const [search, setSearch] = useState('')
+  const [cityFilter, setCityFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState('')
+  const [genreFilter, setGenreFilter] = useState('')
+  const [entradaFilter, setEntradaFilter] = useState('')
+  const [selected, setSelected] = useState<VenueDB | null>(null)
   const [contactEmail, setContactEmail] = useState('')
   const [emailLoading, setEmailLoading] = useState(false)
 
-  async function doResearch(name = venueName, city = venueCity, genre = venueGenre) {
-    if (!name.trim()) return
-    setLoading(true)
-    setResult(null)
-    setContactEmail('')
+  const filtered = useMemo(() => {
+    return VENUES_DB.filter(v => {
+      const matchSearch = !search || v.name.toLowerCase().includes(search.toLowerCase()) || v.area.toLowerCase().includes(search.toLowerCase())
+      const matchCity = !cityFilter || v.city === cityFilter
+      const matchType = !typeFilter || v.type === typeFilter
+      const matchGenre = !genreFilter || v.genres.some(g => g.includes(genreFilter))
+      const matchEntrada = !entradaFilter || v.entrada_tipo === entradaFilter
+      return matchSearch && matchCity && matchType && matchGenre && matchEntrada
+    })
+  }, [search, cityFilter, typeFilter, genreFilter, entradaFilter])
 
-    try {
-      const response = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'research', data: { name, city, genre } }),
-      })
-      const data = await response.json()
-      setResult(data.result)
-    } catch {
-      alert('Error de conexión')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function generateEmail() {
-    if (!result) return
+  async function generateEmail(venue: VenueDB) {
     setEmailLoading(true)
+    setContactEmail('')
     try {
-      const response = await fetch('/api/ai', {
+      const r = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'contact_email', data: { venue: result.nombre, city: result.ciudad, genre: venueGenre } }),
+        body: JSON.stringify({
+          type: 'contact_email',
+          data: { venue: venue.name, city: venue.city, genre: venue.genres[0] },
+        }),
       })
-      const data = await response.json()
+      const data = await r.json()
       setContactEmail(data.result)
     } catch {
-      alert('Error generando email')
+      setContactEmail('Error generando email.')
     } finally {
       setEmailLoading(false)
     }
-  }
-
-  function quickSearch(item: typeof QUICK_SEARCHES[0]) {
-    setVenueName(item.name)
-    setVenueCity(item.city)
-    setVenueGenre(item.genre)
-    doResearch(item.name, item.city, item.genre)
   }
 
   return (
     <AppLayout>
       <div>
         <h1 className="page-title">Research de venues</h1>
-        <p className="page-sub">Investiga un club o promotor antes de contactar · powered by IA</p>
+        <p className="page-sub">Base de datos de {VENUE_STATS.total} venues en {VENUE_STATS.cities} ciudades europeas</p>
 
-        {/* Search form */}
-        <div className="card mb-5">
-          <div className="section-title">Buscar venue</div>
-          <div className="flex gap-3 items-end flex-wrap">
-            <div className="flex-[2] min-w-[180px]">
-              <label className="form-label">Nombre del venue / club / festival</label>
-              <input
-                className="form-input"
-                placeholder="Fabric, Tresor, Sonar..."
-                value={venueName}
-                onChange={e => setVenueName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && doResearch()}
-              />
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {[
+            { n: VENUE_STATS.total, label: 'Venues totales' },
+            { n: VENUE_STATS.clubs, label: 'Clubs' },
+            { n: VENUE_STATS.bars, label: 'Bares' },
+            { n: VENUE_STATS.festivals, label: 'Festivales' },
+          ].map(s => (
+            <div key={s.label} className="card text-center py-3">
+              <div className="stat-value text-2xl">{s.n}</div>
+              <div className="stat-label">{s.label}</div>
             </div>
-            <div className="flex-1 min-w-[130px]">
-              <label className="form-label">Ciudad / País</label>
-              <input
-                className="form-input"
-                placeholder="Berlín, Alemania"
-                value={venueCity}
-                onChange={e => setVenueCity(e.target.value)}
-              />
-            </div>
-            <div className="flex-1 min-w-[130px]">
-              <label className="form-label">Género</label>
-              <select className="form-input" value={venueGenre} onChange={e => setVenueGenre(e.target.value)}>
-                {['Techno', 'House', 'Afro House', 'Drum & Bass', 'Trance', 'Mixed'].map(g => (
-                  <option key={g}>{g}</option>
-                ))}
-              </select>
-            </div>
-            <button
-              className="btn-primary"
-              onClick={() => doResearch()}
-              disabled={loading || !venueName}
-            >
-              {loading ? '⟳ Investigando...' : '🔍 Investigar'}
-            </button>
-          </div>
-
-          <div className="mt-4">
-            <div className="text-xs text-muted mb-2">Búsquedas rápidas:</div>
-            <div className="flex gap-2 flex-wrap">
-              {QUICK_SEARCHES.map(item => (
-                <button
-                  key={item.name}
-                  className="btn-ghost text-xs py-1 px-3"
-                  onClick={() => quickSearch(item)}
-                >
-                  {item.name} · {item.city}
-                </button>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="card text-center py-12">
-            <div className="flex justify-center gap-1 mb-3">
-              {[0, 1, 2].map(i => (
-                <div key={i} className="w-2 h-2 rounded-full bg-muted animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
-              ))}
+        {/* Filters */}
+        <div className="card mb-5">
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="form-label">Buscar venue</label>
+              <input className="form-input" placeholder="Nombre, barrio..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-            <div className="text-muted text-sm">Investigando {venueName}...</div>
+            <div>
+              <label className="form-label">Ciudad</label>
+              <select className="form-input" value={cityFilter} onChange={e => setCityFilter(e.target.value)}>
+                <option value="">Todas las ciudades</option>
+                {CITIES.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
           </div>
-        )}
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="form-label">Tipo</label>
+              <select className="form-input" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+                {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Género</label>
+              <select className="form-input" value={genreFilter} onChange={e => setGenreFilter(e.target.value)}>
+                <option value="">Todos los géneros</option>
+                {GENRES.map(g => <option key={g}>{g}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Precio entrada</label>
+              <select className="form-input" value={entradaFilter} onChange={e => setEntradaFilter(e.target.value)}>
+                {ENTRADA_TIPOS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="mt-3 text-xs text-muted">{filtered.length} venues encontrados</div>
+        </div>
 
-        {/* Result */}
-        {result && !loading && (
-          <div className="bg-surface2 border border-white/[0.08] rounded-2xl p-6 mb-5">
+        {/* Detail panel */}
+        {selected && (
+          <div className="card mb-5">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="font-display text-xl font-bold text-white">{result.nombre}</h2>
-                <div className="text-sm text-muted mt-1">{result.ciudad} · {result.tipo} · Fundado {result.fundado} · ~{result.aforo} personas</div>
+                <h2 className="font-display text-xl font-bold">{selected.name}</h2>
+                <div className="text-sm text-muted mt-1">{selected.area}, {selected.city} · {selected.type === 'club' ? 'Club' : selected.type === 'bar' ? 'Bar' : 'Festival'} · ~{selected.aforo} personas · Est. {selected.fundado}</div>
               </div>
-              <div className="w-14 h-14 rounded-full border-2 border-accent flex flex-col items-center justify-center flex-shrink-0">
-                <div className="font-display text-xl font-extrabold text-accent leading-none">{result.score}</div>
-                <div className="text-[9px] text-muted">score</div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full border-2 border-accent flex flex-col items-center justify-center">
+                  <div className="font-display text-lg font-bold text-accent leading-none">{selected.score}</div>
+                  <div className="text-[9px] text-muted">score</div>
+                </div>
+                <button onClick={() => { setSelected(null); setContactEmail('') }} className="text-muted hover:text-white text-xl">✕</button>
               </div>
             </div>
 
-            <div className="flex gap-2 flex-wrap mb-5">
-              {result.generos.map(g => (
-                <span key={g} className="text-xs px-2.5 py-1 rounded-full bg-white/[0.06] text-muted border border-white/[0.08]">{g}</span>
+            <div className="flex gap-2 flex-wrap mb-4">
+              {selected.genres.map(g => (
+                <span key={g} className="text-xs px-2.5 py-1 rounded-full bg-surface2 border border-white/[0.08] text-muted">{g}</span>
               ))}
-              <span className="text-xs px-2.5 py-1 rounded-full bg-white/[0.06] text-muted border border-white/[0.08]">{result.tipo}</span>
+              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${ENTRADA_COLORS[selected.entrada_tipo]}`}>
+                Entrada: {selected.entrada_precio}
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               {[
-                ['Ambiente', result.ambiente],
-                ['Artistas notables', result.artistas_notables],
-                ['Mejor momento', result.mejor_momento],
-                ['Cachet (DJ nuevo)', result.cachet_rango],
+                ['Ambiente', selected.ambiente],
+                ['Artistas notables', selected.artistas],
+                ['Precio entrada público', `${selected.entrada_precio} — ${selected.entrada_nota}`],
+                ['Cachet DJ nuevo', selected.cachet],
+                ['Mejor momento', selected.mejor],
+                ['Cómo contactar', selected.contacto],
               ].map(([k, v]) => (
-                <div key={k} className="bg-surface rounded-xl p-3">
+                <div key={k} className="bg-surface2 rounded-xl p-3">
                   <div className="text-xs text-muted mb-1">{k}</div>
                   <div className="text-sm text-white">{v}</div>
                 </div>
               ))}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="p-3 bg-accent/5 border border-accent/15 rounded-xl">
                 <div className="text-xs text-accent font-semibold tracking-wider mb-1">REPUTACIÓN CON DJs</div>
-                <div className="text-sm text-white">{result.reputacion}</div>
+                <div className="text-sm text-white">{selected.reputacion}</div>
               </div>
-
-              {result.red_flags && result.red_flags !== 'Ninguno conocido' && (
+              {selected.red_flag && (
                 <div className="p-3 bg-red-400/5 border border-red-400/20 rounded-xl">
                   <div className="text-xs text-red-400 font-semibold tracking-wider mb-1">RED FLAGS</div>
-                  <div className="text-sm text-white">{result.red_flags}</div>
+                  <div className="text-sm text-white">{selected.red_flag}</div>
                 </div>
               )}
-
               <div className="p-3 bg-accent2/5 border border-accent2/15 rounded-xl">
-                <div className="text-xs text-accent2/80 font-semibold tracking-wider mb-1" style={{color:'#b39dfa'}}>CÓMO CONTACTAR</div>
-                <div className="text-sm text-white">{result.como_contactar}</div>
-              </div>
-
-              <div className="p-3 bg-accent/5 border border-accent/15 rounded-xl">
-                <div className="text-xs text-accent font-semibold tracking-wider mb-1">CONSEJO PARA TI</div>
-                <div className="text-sm text-white">{result.consejo_dj}</div>
+                <div className="text-xs font-semibold tracking-wider mb-1" style={{color:'#b39dfa'}}>CONSEJO PARA TI</div>
+                <div className="text-sm text-white">{selected.consejo}</div>
               </div>
             </div>
 
-            <div className="flex gap-3 mt-5">
-              <button
-                className="btn-primary text-sm"
-                onClick={generateEmail}
-                disabled={emailLoading}
-              >
+            <div className="flex gap-3 mt-4">
+              <button className="btn-primary text-sm" onClick={() => generateEmail(selected)} disabled={emailLoading}>
                 {emailLoading ? '⟳ Generando...' : '✉️ Generar email de contacto'}
               </button>
-              <button className="btn-ghost text-sm" onClick={() => setResult(null)}>
-                ← Nueva búsqueda
-              </button>
+              <button className="btn-ghost text-sm" onClick={() => { setSelected(null); setContactEmail('') }}>← Volver</button>
             </div>
 
-            {/* Contact email */}
             {contactEmail && (
-              <div className="mt-4 p-4 bg-surface rounded-xl border border-white/[0.08]">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-white">Email de contacto generado</span>
-                  <button
-                    className="btn-primary text-xs py-1 px-3"
-                    onClick={() => navigator.clipboard.writeText(contactEmail)}
-                  >
-                    Copiar
-                  </button>
+              <div className="mt-4 p-4 bg-surface2 rounded-xl border border-white/[0.08]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Email generado</span>
+                  <button className="btn-primary text-xs py-1 px-3" onClick={() => navigator.clipboard.writeText(contactEmail)}>Copiar</button>
                 </div>
-                <div className="generated-content text-xs">{contactEmail}</div>
+                <div className="text-xs text-white whitespace-pre-wrap leading-relaxed bg-surface p-3 rounded-lg">{contactEmail}</div>
               </div>
             )}
           </div>
         )}
 
-        {/* Tips (when no result) */}
-        {!result && !loading && (
-          <div className="card">
-            <div className="section-title">¿Qué investigar antes de contactar?</div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { title: 'REPUTACIÓN Y PAGOS', text: 'Busca en foros de DJs si pagan a tiempo, respetan los riders y tratan bien a los artistas.', color: 'accent' },
-                { title: 'PROGRAMACIÓN', text: 'Revisa quién ha tocado los últimos 3 meses. ¿Tu estilo encaja con su línea artística?', color: 'accent' },
-                { title: 'RED FLAGS', text: 'Promotores que piden tocar gratis "por exposición", que cambian cachets o no tienen contrato.', color: 'red-400', bg: 'red-400' },
-                { title: 'ESTRATEGIA DE CONTACTO', text: 'Menciona artistas similares que hayan tocado allí. Demuestra que conoces su programación.', color: 'accent2/80', bg: 'accent2' },
-              ].map(item => (
-                <div key={item.title} className={`p-3 bg-${item.bg || 'accent'}/5 border border-${item.bg || 'accent'}/15 rounded-xl`}>
-                  <div className={`text-xs font-semibold tracking-wider mb-1 text-${item.color}`}>{item.title}</div>
-                  <div className="text-sm text-white/80">{item.text}</div>
+        {/* Venues grid */}
+        <div className="grid grid-cols-3 gap-4">
+          {filtered.map(venue => (
+            <button
+              key={venue.id}
+              onClick={() => { setSelected(venue); setContactEmail(''); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+              className={`text-left card hover:border-white/20 transition-all ${selected?.id === venue.id ? 'border-accent2/40' : ''}`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-white flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: TYPE_COLORS[venue.type] }} />
+                    <span className="truncate">{venue.name}</span>
+                  </div>
+                  <div className="text-xs text-muted mt-0.5">{venue.area}, {venue.city}</div>
                 </div>
-              ))}
-            </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ml-2 ${venue.score >= 9 ? 'bg-accent/10 text-accent' : venue.score >= 8 ? 'bg-amber-500/10 text-amber-400' : 'bg-white/5 text-muted'}`}>
+                  {venue.score}★
+                </span>
+              </div>
+              <div className="flex gap-1.5 flex-wrap mb-2">
+                {venue.genres.slice(0, 2).map(g => (
+                  <span key={g} className="text-[10px] px-2 py-0.5 rounded-full bg-surface2 border border-white/[0.08] text-muted">{g}</span>
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-white/[0.06]">
+                <span className="text-muted">DJ: <span className="text-white font-medium">{venue.cachet}</span></span>
+                <span className={`px-2 py-0.5 rounded-full font-medium ${ENTRADA_COLORS[venue.entrada_tipo]}`}>
+                  {venue.entrada_precio}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="text-center py-12 text-muted text-sm">
+            No hay venues con estos filtros.
           </div>
         )}
       </div>

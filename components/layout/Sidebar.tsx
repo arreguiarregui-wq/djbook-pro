@@ -11,6 +11,8 @@ const navItems = [
   { href: '/mentoring', label: 'Plan de carrera IA', icon: '🎯', section: 'HERRAMIENTAS IA', badge: 'NUEVO' },
   { href: '/negociador', label: 'Negociador de cachet', icon: '💰', badge: 'NUEVO' },
   { href: '/research', label: 'Research de venues', icon: '🔍', badge: 'NUEVO' },
+  { href: '/inspiracion', label: 'Inspiración musical', icon: '🎵', badge: 'NUEVO' },
+  { href: '/inspiracion', label: 'Inspiracion musical', icon: '★', badge: 'NUEVO' },
   { href: '/marketing', label: 'Marketing IA', icon: '◈' },
   { href: '/chat', label: 'Asistente IA', icon: '◎' },
 ]

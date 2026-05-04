@@ -4,6 +4,8 @@ import Anthropic from '@anthropic-ai/sdk'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const PROMPTS = {
+  mentoring: (d: any) => d.prompt,
+
   negotiation: (d: any) => `Eres un manager experto en la industria de la música electrónica europea.
 Un DJ con ${d.experienceYears} años de experiencia quiere tocar en un ${d.tipoEvento} en ${d.ciudad} (aforo: ${d.aforo} personas, ${d.durationHours}h de set).
 Su cachet objetivo es €${d.target} (rango: €${d.min}–€${Math.round(d.target * 1.35)}).

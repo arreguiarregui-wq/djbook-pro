@@ -108,7 +108,14 @@ export default function MentoringPage() {
       const d = await r.json()
       const text = (d.result || '{}').replace(/```json|```/g, '').trim()
       const parsed = JSON.parse(text)
-      setPlan(parsed)
+      const safePlan = {
+        fase1: parsed.fase1 || {titulo:"Mes 1",objetivo:"Construir base",acciones:["Acción 1","Acción 2","Acción 3"]},
+        fase2: parsed.fase2 || {titulo:"Mes 2-3",objetivo:"Crecer",acciones:["Acción 1","Acción 2","Acción 3"]},
+        fase3: parsed.fase3 || {titulo:"Mes 4-6",objetivo:"Consolidar",acciones:["Acción 1","Acción 2","Acción 3"]},
+        consejo_especial: parsed.consejo_especial || "",
+        error_comun: parsed.error_comun || ""
+      }
+      setPlan(safePlan)
     } catch {
       setError('Error generando el plan. Inténtalo de nuevo.')
     } finally {

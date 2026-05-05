@@ -13,7 +13,6 @@ const navItems = [
   { href: '/negociador', label: 'Negociador de cachet', icon: '💰', badge: 'NUEVO' },
   { href: '/research', label: 'Research de venues', icon: '🔍', badge: 'NUEVO' },
   { href: '/inspiracion', label: 'Inspiración musical', icon: '🎵', badge: 'NUEVO' },
-  { href: '/inspiracion', label: 'Inspiracion musical', icon: '★', badge: 'NUEVO' },
   { href: '/marketing', label: 'Marketing IA', icon: '◈' },
   { href: '/chat', label: 'Asistente IA', icon: '◎' },
 ]

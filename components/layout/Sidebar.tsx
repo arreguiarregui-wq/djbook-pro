@@ -7,7 +7,6 @@ import { clsx } from 'clsx'
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '⬡', section: 'PRINCIPAL' },
   { href: '/bookings', label: 'Bookings', icon: '◈' },
-  { href: '/calendario', label: 'Calendario', icon: '◷' },
   { href: '/perfil', label: 'Mi perfil', icon: '◉' },
   { href: '/mentoring', label: 'Plan de carrera IA', icon: '🎯', section: 'HERRAMIENTAS IA', badge: 'NUEVO' },
   { href: '/negociador', label: 'Negociador de cachet', icon: '💰', badge: 'NUEVO' },

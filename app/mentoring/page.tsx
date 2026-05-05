@@ -142,7 +142,7 @@ export default function MentoringPage() {
         {/* STEP 1 — Perfil */}
         {step === 1 && (
           <div>
-            <h1 className="page-title">Bienvenido a DJBook Pro</h1>
+            <h1 className="page-title">Bienvenido a BeatBroker</h1>
             <p className="page-sub">Cuéntanos en qué punto de tu carrera estás para personalizar tu experiencia.</p>
 
             <div className="space-y-3">

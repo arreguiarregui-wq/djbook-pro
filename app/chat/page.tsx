@@ -15,7 +15,7 @@ const QUICK_PROMPTS = [
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Hola! Soy tu asistente de DJBook Pro. Puedo ayudarte con cachets, negociaciones, venues, marketing, contratos y todo lo que necesites para tu carrera. ¿En qué te ayudo hoy?' }
+    { role: 'assistant', content: '¡Hola! Soy tu asistente de BeatBroker. Puedo ayudarte con cachets, negociaciones, venues, marketing, contratos y todo lo que necesites para tu carrera. ¿En qué te ayudo hoy?' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)

@@ -47,7 +47,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-2xl font-medium text-white mb-1">DJBook Pro</div>
+          <div className="text-2xl font-medium text-white mb-1">BeatBroker</div>
           <div className="text-sm text-muted">Tu manager de bookings con IA</div>
         </div>
         <div className="bg-[#111] border border-white/[0.08] rounded-2xl p-6">

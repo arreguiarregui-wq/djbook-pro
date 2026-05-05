@@ -1,19 +1,19 @@
 'use client'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 import { clsx } from 'clsx'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '⬡', section: 'PRINCIPAL' },
+  { href: '/dashboard', label: 'Dashboard', icon: '⬡', section: 'MAIN' },
   { href: '/bookings', label: 'Bookings', icon: '◈' },
-  { href: '/perfil', label: 'Mi perfil', icon: '◉' },
-  { href: '/mentoring', label: 'Plan de carrera IA', icon: '🎯', section: 'HERRAMIENTAS IA', badge: 'NUEVO' },
-  { href: '/negociador', label: 'Negociador de cachet', icon: '💰', badge: 'NUEVO' },
-  { href: '/research', label: 'Research de venues', icon: '🔍', badge: 'NUEVO' },
-  { href: '/inspiracion', label: 'Inspiración musical', icon: '🎵', badge: 'NUEVO' },
-  { href: '/marketing', label: 'Marketing IA', icon: '◈' },
-  { href: '/chat', label: 'Asistente IA', icon: '◎' },
+  { href: '/perfil', label: 'My Profile', icon: '◉' },
+  { href: '/mentoring', label: 'Career Plan AI', icon: '🎯', section: 'AI TOOLS', badge: 'NEW' },
+  { href: '/negociador', label: 'Fee Negotiator', icon: '💰', badge: 'NEW' },
+  { href: '/research', label: 'Venue Research', icon: '🔍', badge: 'NEW' },
+  { href: '/inspiracion', label: 'Music Inspiration', icon: '🎵', badge: 'NEW' },
+  { href: '/marketing', label: 'Marketing AI', icon: '◈' },
+  { href: '/chat', label: 'AI Assistant', icon: '◎' },
 ]
 
 interface SidebarProps {
@@ -21,7 +21,7 @@ interface SidebarProps {
   plan?: 'free' | 'pro'
 }
 
-export default function Sidebar({ djName = 'DJ TuNombre', plan = 'free' }: SidebarProps) {
+export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: SidebarProps) {
   const pathname = usePathname()
 
   return (
@@ -30,7 +30,7 @@ export default function Sidebar({ djName = 'DJ TuNombre', plan = 'free' }: Sideb
         <span className="text-white">Beat</span>Broker
       </div>
 
-      {navItems.map((item, i) => (
+      {navItems.map((item) => (
         <div key={item.href}>
           {item.section && (
             <div className="text-[10px] text-muted tracking-widest px-3 mt-4 mb-1.5">
@@ -65,7 +65,7 @@ export default function Sidebar({ djName = 'DJ TuNombre', plan = 'free' }: Sideb
           <div className="flex-1 min-w-0">
             <div className="text-xs font-medium text-white">{djName}</div>
             <div className="text-[11px] text-accent">
-              {plan === 'pro' ? '✦ Pro Plan' : '○ Plan Gratuito'}
+              {plan === 'pro' ? '✦ Pro Plan' : '○ Free Plan'}
             </div>
           </div>
           <button
@@ -75,9 +75,9 @@ export default function Sidebar({ djName = 'DJ TuNombre', plan = 'free' }: Sideb
               window.location.href = '/login'
             }}
             className="text-[11px] text-muted hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-white/[0.05]"
-            title="Cerrar sesion"
+            title="Sign out"
           >
-            Salir
+            Sign out
           </button>
         </div>
       </div>

@@ -31,7 +31,7 @@ export default function LoginPage() {
         password,
         options: {
           data: { nombre_artistico: nombre },
-          emailRedirectTo: window.location.origin + '/auth/callback',
+          emailRedirectTo: 'https://djbookpro.vercel.app/auth/callback',
         },
       })
       if (error) {

@@ -27,7 +27,7 @@ export default function Sidebar({ djName = 'DJ TuNombre', plan = 'free' }: Sideb
   return (
     <nav className="w-[220px] min-h-screen bg-surface border-r border-white/[0.08] flex flex-col px-4 py-6 fixed left-0 top-0 bottom-0 overflow-y-auto">
       <div className="font-display text-xl font-extrabold text-accent tracking-tight mb-7 px-2">
-        DJ<span className="text-white">Book</span>
+        Beat<span className="text-white">Broker</span>
       </div>
 
       {navItems.map((item, i) => (

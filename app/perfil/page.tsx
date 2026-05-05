@@ -3,29 +3,28 @@ import { useState, useEffect } from 'react'
 import AppLayout from '@/components/layout/AppLayout'
 import { createClient } from '@/lib/supabase-browser'
 
+const supabase = createClient()
+
 export default function PerfilPage() {
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [msg, setMsg] = useState('')
+  const [userId, setUserId] = useState('')
 
   const [djName, setDjName] = useState('')
   const [bio, setBio] = useState('')
   const [city, setCity] = useState('')
   const [instagram, setInstagram] = useState('')
   const [soundcloud, setSoundcloud] = useState('')
-  const [cachetMin, setCachetMin] = useState(300)
-  const [cachetMax, setCachetMax] = useState(1200)
 
   useEffect(() => {
     loadProfile()
   }, [])
 
   async function loadProfile() {
-    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
+    if (!user) { setLoading(false); return }
     setUserId(user.id)
 
     const { data } = await supabase
@@ -41,22 +40,18 @@ export default function PerfilPage() {
       setInstagram(data.instagram || '')
       setSoundcloud(data.soundcloud || '')
     } else {
-      // Create profile if doesn't exist
       const nombre = user.user_metadata?.nombre_artistico || user.email?.split('@')[0] || 'DJ'
       setDjName(nombre)
-      await supabase.from('profiles').insert({
-        id: user.id,
-        nombre_artistico: nombre,
-      })
+      await supabase.from('profiles').insert({ id: user.id, nombre_artistico: nombre })
     }
     setLoading(false)
   }
 
   async function saveProfile() {
     setSaving(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setSaving(false); return }
+    setMsg('')
+    if (!userId) { setSaving(false); setMsg('Error: no session'); return }
+
     const { error } = await supabase.from('profiles').upsert({
       id: userId,
       nombre_artistico: djName,
@@ -65,16 +60,21 @@ export default function PerfilPage() {
       instagram,
       soundcloud,
     })
-    if (error) { console.error('Error saving:', error) } else { console.log('Saved!') }
+
+    if (error) {
+      setMsg('Error saving: ' + error.message)
+    } else {
+      setMsg('Saved successfully')
+      setEditing(false)
+    }
     setSaving(false)
-    setEditing(false)
   }
 
   if (loading) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="text-muted text-sm">Cargando perfil...</div>
+          <div className="text-muted text-sm">Loading profile...</div>
         </div>
       </AppLayout>
     )
@@ -83,8 +83,14 @@ export default function PerfilPage() {
   return (
     <AppLayout>
       <div>
-        <h1 className="page-title">Mi perfil profesional</h1>
-        <p className="page-sub">Tu identidad publica como DJ</p>
+        <h1 className="page-title">My professional profile</h1>
+        <p className="page-sub">Your public identity as a DJ</p>
+
+        {msg && (
+          <div className={`mb-4 p-3 rounded-xl text-sm ${msg.includes('Error') ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'}`}>
+            {msg}
+          </div>
+        )}
 
         <div className="card mb-5">
           <div className="flex items-start gap-5">
@@ -93,14 +99,14 @@ export default function PerfilPage() {
             </div>
             <div className="flex-1">
               {editing ? (
-                <input className="form-input text-xl font-bold mb-2" value={djName} onChange={e => setDjName(e.target.value)} placeholder="Tu nombre artistico" />
+                <input className="form-input text-xl font-bold mb-2" value={djName} onChange={e => setDjName(e.target.value)} placeholder="Your artist name" />
               ) : (
-                <div className="font-display text-2xl font-extrabold text-white mb-1">{djName || 'Tu nombre artistico'}</div>
+                <div className="font-display text-2xl font-extrabold text-white mb-1">{djName || 'Your artist name'}</div>
               )}
               {editing ? (
-                <textarea className="form-input mt-2" value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Escribe tu bio profesional..." />
+                <textarea className="form-input mt-2" value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Write your professional bio..." />
               ) : (
-                <div className="text-muted text-sm leading-relaxed max-w-xl mt-1">{bio || 'Añade tu bio profesional...'}</div>
+                <div className="text-muted text-sm leading-relaxed max-w-xl mt-1">{bio || 'Add your professional bio...'}</div>
               )}
             </div>
           </div>
@@ -108,54 +114,38 @@ export default function PerfilPage() {
             {editing ? (
               <>
                 <button className="btn-primary" onClick={saveProfile} disabled={saving}>
-                  {saving ? 'Guardando...' : 'Guardar cambios'}
+                  {saving ? 'Saving...' : 'Save changes'}
                 </button>
-                <button className="btn-ghost" onClick={() => setEditing(false)}>Cancelar</button>
+                <button className="btn-ghost" onClick={() => setEditing(false)}>Cancel</button>
               </>
             ) : (
-              <button className="btn-ghost" onClick={() => setEditing(true)}>Editar perfil</button>
+              <button className="btn-ghost" onClick={() => setEditing(true)}>Edit profile</button>
             )}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="card">
-            <div className="text-xs text-muted mb-3 font-medium uppercase tracking-wider">Informacion</div>
+            <div className="text-xs text-muted mb-3 font-medium uppercase tracking-wider">Information</div>
             <div className="space-y-3">
               <div>
-                <label className="form-label">Ciudad</label>
+                <label className="form-label">City</label>
                 {editing ? (
-                  <input className="form-input" value={city} onChange={e => setCity(e.target.value)} placeholder="Berlin, Madrid..." />
+                  <input className="form-input" value={city} onChange={e => setCity(e.target.value)} placeholder="Berlin, London..." />
                 ) : (
                   <div className="text-sm text-white">{city || '—'}</div>
-                )}
-              </div>
-              <div>
-                <label className="form-label">Cachet minimo</label>
-                {editing ? (
-                  <input type="number" className="form-input" value={cachetMin} onChange={e => setCachetMin(Number(e.target.value))} />
-                ) : (
-                  <div className="text-sm text-white">€{cachetMin}</div>
-                )}
-              </div>
-              <div>
-                <label className="form-label">Cachet maximo</label>
-                {editing ? (
-                  <input type="number" className="form-input" value={cachetMax} onChange={e => setCachetMax(Number(e.target.value))} />
-                ) : (
-                  <div className="text-sm text-white">€{cachetMax}</div>
                 )}
               </div>
             </div>
           </div>
 
           <div className="card">
-            <div className="text-xs text-muted mb-3 font-medium uppercase tracking-wider">Redes sociales</div>
+            <div className="text-xs text-muted mb-3 font-medium uppercase tracking-wider">Social media</div>
             <div className="space-y-3">
               <div>
                 <label className="form-label">Instagram</label>
                 {editing ? (
-                  <input className="form-input" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="@tunombre" />
+                  <input className="form-input" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="@yourname" />
                 ) : (
                   <div className="text-sm text-white">{instagram || '—'}</div>
                 )}
@@ -163,7 +153,7 @@ export default function PerfilPage() {
               <div>
                 <label className="form-label">SoundCloud</label>
                 {editing ? (
-                  <input className="form-input" value={soundcloud} onChange={e => setSoundcloud(e.target.value)} placeholder="soundcloud.com/tunombre" />
+                  <input className="form-input" value={soundcloud} onChange={e => setSoundcloud(e.target.value)} placeholder="soundcloud.com/yourname" />
                 ) : (
                   <div className="text-sm text-white">{soundcloud || '—'}</div>
                 )}

@@ -5,17 +5,17 @@ import AppLayout from '@/components/layout/AppLayout'
 interface Message { role: 'user' | 'assistant'; content: string }
 
 const QUICK_PROMPTS = [
-  '¿Cuánto cobrar en un club de 500 personas con 2 años de experiencia?',
-  'Cómo negociar si el promotor ofrece menos de lo que pido',
-  '¿Qué red flags debo evitar con un nuevo promotor?',
-  'Cómo conseguir mi primer booking en un club serio',
-  '¿Qué debe incluir un rider técnico básico?',
-  'Cómo crecer en redes siendo DJ nuevo',
+  'How much should I charge at a 500-person club with 2 years of experience?',
+  'How to negotiate when the promoter offers less than I ask',
+  'What red flags should I avoid with a new promoter?',
+  'How to land my first booking at a serious club',
+  'What should a basic technical rider include?',
+  'How to grow on social media as a new DJ',
 ]
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Hola! Soy tu asistente de BeatBroker. Puedo ayudarte con cachets, negociaciones, venues, marketing, contratos y todo lo que necesites para tu carrera. ¿En qué te ayudo hoy?' }
+    { role: 'assistant', content: 'Hi! I am your BeatBroker AI assistant. I can help you with fees, negotiations, venues, marketing, contracts and everything you need for your career. How can I help you today?' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -42,7 +42,7 @@ export default function ChatPage() {
       const data = await response.json()
       setMessages(prev => [...prev, { role: 'assistant', content: data.result || 'Error' }])
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexión. Inténtalo de nuevo.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }])
     } finally {
       setLoading(false)
     }
@@ -51,11 +51,10 @@ export default function ChatPage() {
   return (
     <AppLayout>
       <div>
-        <h1 className="page-title">Asistente IA</h1>
-        <p className="page-sub">Tu manager virtual disponible 24/7</p>
+        <h1 className="page-title">AI Assistant</h1>
+        <p className="page-sub">Your virtual manager available 24/7</p>
 
         <div className="card">
-          {/* Messages */}
           <div className="h-[420px] overflow-y-auto flex flex-col gap-3 mb-4 pr-1">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -65,7 +64,7 @@ export default function ChatPage() {
                     : 'bg-surface2 text-white rounded-bl-sm'
                 }`}>
                   {msg.role === 'assistant' && (
-                    <div className="text-[10px] text-accent font-semibold tracking-wider mb-1">DJBOOK AI</div>
+                    <div className="text-[10px] text-accent font-semibold tracking-wider mb-1">BEATBROKER AI</div>
                   )}
                   <div className="whitespace-pre-wrap">{msg.content}</div>
                 </div>
@@ -74,7 +73,7 @@ export default function ChatPage() {
             {loading && (
               <div className="flex justify-start">
                 <div className="bg-surface2 rounded-2xl rounded-bl-sm px-4 py-3">
-                  <div className="text-[10px] text-accent font-semibold tracking-wider mb-1">DJBOOK AI</div>
+                  <div className="text-[10px] text-accent font-semibold tracking-wider mb-1">BEATBROKER AI</div>
                   <div className="flex gap-1">
                     {[0, 1, 2].map(i => (
                       <div key={i} className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
@@ -86,7 +85,6 @@ export default function ChatPage() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Quick prompts */}
           <div className="flex gap-2 flex-wrap mb-3">
             {QUICK_PROMPTS.slice(0, 4).map(p => (
               <button key={p} className="btn-ghost text-xs py-1.5 px-3" onClick={() => send(p)} disabled={loading}>
@@ -95,18 +93,17 @@ export default function ChatPage() {
             ))}
           </div>
 
-          {/* Input */}
           <div className="flex gap-3">
             <input
               className="form-input flex-1"
-              placeholder="Pregunta lo que necesites..."
+              placeholder="Ask anything..."
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
               disabled={loading}
             />
             <button className="btn-accent2 px-5" onClick={() => send()} disabled={loading || !input.trim()}>
-              Enviar
+              Send
             </button>
           </div>
         </div>

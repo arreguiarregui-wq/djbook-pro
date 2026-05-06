@@ -13,6 +13,7 @@ const navItems = [
   { href: '/research', label: 'Venue Research', icon: '🔍', badge: 'NEW' },
   { href: '/inspiracion', label: 'Music Inspiration', icon: '🎵', badge: 'NEW' },
   { href: '/marketing', label: 'Marketing AI', icon: '◈' },
+  { href: '/networking', label: 'DJ Network', icon: '◈', badge: 'NEW' },
   { href: '/chat', label: 'AI Assistant', icon: '◎' },
 ]
 

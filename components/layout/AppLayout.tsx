@@ -1,3 +1,4 @@
+'use client'
 import Sidebar from '@/components/layout/Sidebar'
 import { useAuth } from '@/lib/useAuth'
 

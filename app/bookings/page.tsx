@@ -175,7 +175,7 @@ function NewBookingModal({ userId, onClose, onSaved }: { userId: string; onClose
   const [duration, setDuration] = useState(4)
   const [genre, setGenre] = useState('')
   const [cachet, setCachet] = useState('')
-  const [status, setStatus] = useState('pending')
+  const [status, setStatus] = useState('pendiente')
   const [promoterEmail, setPromoterEmail] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
@@ -184,20 +184,25 @@ function NewBookingModal({ userId, onClose, onSaved }: { userId: string; onClose
   async function save() {
     if (!venueName || !eventDate) { setError('Venue and date are required.'); return }
     setSaving(true)
-    const { error } = await supabase.from('bookings').insert({
-      user_id: userId,
+    const supabase2 = createClient()
+    const { data: { user } } = await supabase2.auth.getUser()
+    console.log('USER:', user?.id)
+    if (!user) { setError('Not logged in.'); setSaving(false); return }
+    const insertData = {
+      user_id: user.id,
       venue_name: venueName,
       venue_city: venueCity,
       event_date: eventDate,
-      start_time: startTime,
       duration_hours: duration,
       genre,
-      cachet: parseFloat(cachet) || 0,
+      cachet: parseInt(cachet) || 0,
       status,
       promoter_email: promoterEmail,
       notes,
-    })
-    if (error) { setError(error.message); setSaving(false); return }
+    }
+    console.log('INSERT DATA:', JSON.stringify(insertData))
+    const { error } = await supabase2.from('bookings').insert(insertData)
+    if (error) { setError(JSON.stringify(error)); setSaving(false); return }
     onSaved()
   }
 
@@ -246,10 +251,10 @@ function NewBookingModal({ userId, onClose, onSaved }: { userId: string; onClose
             <div>
               <label className="form-label">Status</label>
               <select className="form-input" value={status} onChange={e => setStatus(e.target.value)}>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="pendiente">Pending</option>
+                <option value="confirmado">Confirmed</option>
+                <option value="completado">Completed</option>
+                <option value="cancelado">Cancelled</option>
               </select>
             </div>
           </div>

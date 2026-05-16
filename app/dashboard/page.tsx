@@ -26,7 +26,7 @@ export default function DashboardPage() {
         <h1 className="page-title">Dashboard</h1>
         <p className="page-sub">Welcome back · 2 pending bookings</p>
 
-        <div className="grid grid-cols-4 gap-4 mb-6">
+       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
           <div className="card">
             <div className="stat-value">{stats.bookings_this_month}</div>
             <div className="stat-label">Bookings this month</div>
@@ -49,7 +49,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <span className="section-title mb-0">Upcoming bookings</span>

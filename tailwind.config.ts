@@ -16,7 +16,7 @@ const config: Config = {
         bg: '#0a0a0f',
         surface: '#13131a',
         surface2: '#1c1c28',
-        accent: '#ff2d9b',
+        accent: '#e879f9',
         accent2: '#7c5ff5',
         border: 'rgba(255,255,255,0.08)',
       },

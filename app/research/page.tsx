@@ -212,37 +212,42 @@ export default function ResearchPage() {
         )}
 
         {/* Venues grid */}
-        <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
           {filtered.map(venue => (
-            <button
-              key={venue.id}
-              onClick={() => { setSelected(venue); setContactEmail(''); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-              className={`text-left card hover:border-white/20 transition-all ${selected?.id === venue.id ? 'border-accent2/40' : ''}`}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-white flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: TYPE_COLORS[venue.type] }} />
-                    <span className="truncate">{venue.name}</span>
-                  </div>
-                  <div className="text-xs text-muted mt-0.5">{venue.area}, {venue.city}</div>
-                </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ml-2 ${venue.score >= 9 ? 'bg-accent/10 text-accent' : venue.score >= 8 ? 'bg-amber-500/10 text-amber-400' : 'bg-white/5 text-muted'}`}>
-                  {venue.score}★
-                </span>
-              </div>
-              <div className="flex gap-1.5 flex-wrap mb-2">
-                {venue.genres.slice(0, 2).map(g => (
-                  <span key={g} className="text-[10px] px-2 py-0.5 rounded-full bg-surface2 border border-white/[0.08] text-muted">{g}</span>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-xs pt-2 border-t border-white/[0.06]">
-                <span className="text-muted">DJ: <span className="text-white font-medium">{venue.cachet}</span></span>
-                <span className={`px-2 py-0.5 rounded-full font-medium ${ENTRADA_COLORS[venue.entrada_tipo]}`}>
-                  {venue.entrada_precio}
-                </span>
-              </div>
-            </button>
+       <button
+  key={venue.id}
+  onClick={() => { setSelected(venue); setContactEmail(''); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+  className={`text-left card hover:border-white/20 transition-all ${selected?.id === venue.id ? 'border-accent2/40' : ''}`}
+>
+  {/* Móvil: layout horizontal */}
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2 flex-1 min-w-0">
+      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: TYPE_COLORS[venue.type] }} />
+      <div className="min-w-0">
+        <div className="text-sm font-semibold text-white truncate">{venue.name}</div>
+        <div className="text-xs text-muted">{venue.area}, {venue.city}</div>
+      </div>
+    </div>
+    <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ml-2 ${venue.score >= 9 ? 'bg-accent/10 text-accent' : venue.score >= 8 ? 'bg-amber-500/10 text-amber-400' : 'bg-white/5 text-muted'}`}>
+      {venue.score}★
+    </span>
+  </div>
+
+  {/* Desktop: info extra */}
+  <div className="hidden md:block mt-2">
+    <div className="flex gap-1.5 flex-wrap mb-2">
+      {venue.genres.slice(0, 2).map(g => (
+        <span key={g} className="text-[10px] px-2 py-0.5 rounded-full bg-surface2 border border-white/[0.08] text-muted">{g}</span>
+      ))}
+    </div>
+    <div className="flex items-center justify-between text-xs pt-2 border-t border-white/[0.06]">
+      <span className="text-muted">DJ: <span className="text-white font-medium">{venue.cachet}</span></span>
+      <span className={`px-2 py-0.5 rounded-full font-medium ${ENTRADA_COLORS[venue.entrada_tipo]}`}>
+        {venue.entrada_precio}
+      </span>
+    </div>
+  </div>
+</button>
           ))}
         </div>
 

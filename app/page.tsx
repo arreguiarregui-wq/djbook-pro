@@ -232,7 +232,7 @@ export default function RootPage() {
                 <li><span className="check">✓</span> 10 AI uses per month</li>
                 <li><span className="check">✓</span> DJ profile</li>
               </ul>
-              <Link href="/register" className="pricing-btn pricing-btn-ghost">Get started free</Link>
+              <Link href="/login" className="pricing-btn pricing-btn-ghost">Get started free</Link>
             </div>
             <div className="pricing-card featured">
               <div className="pricing-badge">Most popular</div>

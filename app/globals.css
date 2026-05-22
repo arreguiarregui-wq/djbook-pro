@@ -19,7 +19,7 @@
 }
 
 body {
-  background: var(--bg);
+  background: #07070e;
   color: var(--text);
   font-family: 'Space Grotesk', sans-serif;
   min-height: 100vh;

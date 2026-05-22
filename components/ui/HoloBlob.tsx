@@ -13,7 +13,7 @@ export default function HoloBlob() {
 
     let animationId: number
     let t = 0
-
+console.log('HoloBlob mounted', canvas.width, canvas.height)
     const resize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight

@@ -9,7 +9,7 @@ export default function HoloBlob() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    if (!ctx || !canvas) return
 
     let animationId: number
     let t = 0

@@ -125,7 +125,7 @@ export default function RootPage() {
           <a href="#features" className="nav-link">Features</a>
           <a href="#pricing" className="nav-link">Pricing</a>
         </div>
-        <Link href="/register" className="nav-cta">Get started free</Link>
+        <Link href="/login" className="nav-cta">Get started free</Link>
       </nav>
 
       <div className="wrap">
@@ -134,7 +134,7 @@ export default function RootPage() {
           <h1>Your DJ career,<br /><em>on autopilot</em></h1>
           <p>Manage bookings, negotiate fees, research venues and create content — all powered by AI.</p>
           <div className="hero-actions">
-            <Link href="/register" className="btn-primary">Start for free →</Link>
+            <Link href="/login" className="btn-primary">Start for free →</Link>
             <a href="#features" className="btn-ghost">See what's inside ↓</a>
           </div>
           <p className="hero-note">No credit card required · Free plan available</p>
@@ -247,7 +247,7 @@ export default function RootPage() {
                 <li><span className="check">✓</span> DJ Network</li>
                 <li><span className="check">✓</span> Priority support</li>
               </ul>
-              <Link href="/register" className="pricing-btn pricing-btn-primary">Start with Pro →</Link>
+              <Link href="/login" className="pricing-btn pricing-btn-primary">Start with Pro →</Link>
             </div>
           </div>
         </section>
@@ -255,7 +255,7 @@ export default function RootPage() {
         <section className="cta-section">
           <h2 className="cta-title">Ready to take your<br />career <em>to the next level</em>?</h2>
           <p className="cta-sub">Join the DJs already managing their career with intelligence.</p>
-          <Link href="/register" className="btn-primary">Create free account →</Link>
+          <Link href="/login" className="btn-primary">Create free account →</Link>
         </section>
 
         <footer>

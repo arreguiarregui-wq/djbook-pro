@@ -7,24 +7,24 @@ import { clsx } from 'clsx'
 import { useState } from 'react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '⬡', section: 'MAIN' },
-  { href: '/bookings', label: 'Bookings', icon: '◈' },
-  { href: '/perfil', label: 'My Profile', icon: '◉' },
-  { href: '/mentoring', label: 'Career Plan AI', icon: '🎯', section: 'AI TOOLS', badge: 'NEW' },
-  { href: '/negociador', label: 'Fee Negotiator', icon: '💰', badge: 'NEW' },
-  { href: '/research', label: 'Venue Research', icon: '🔍', badge: 'NEW' },
-  { href: '/inspiracion', label: 'Music Inspiration', icon: '🎵', badge: 'NEW' },
-  { href: '/marketing', label: 'Marketing AI', icon: '◈' },
-  { href: '/networking', label: 'DJ Network', icon: '◈', badge: 'NEW' },
-  { href: '/chat', label: 'AI Assistant', icon: '◎' },
+  { href: '/dashboard', label: 'Dashboard', section: 'MAIN' },
+  { href: '/bookings', label: 'Bookings' },
+  { href: '/perfil', label: 'My Profile' },
+  { href: '/mentoring', label: 'Career Plan AI', section: 'AI TOOLS', badge: 'NEW' },
+  { href: '/negociador', label: 'Fee Negotiator', badge: 'NEW' },
+  { href: '/research', label: 'Venue Research', badge: 'NEW' },
+  { href: '/inspiracion', label: 'Music Inspiration', badge: 'NEW' },
+  { href: '/marketing', label: 'Marketing AI' },
+  { href: '/networking', label: 'DJ Network', badge: 'NEW' },
+  { href: '/chat', label: 'AI Assistant' },
 ]
 
 const bottomNavItems = [
-  { href: '/dashboard', label: 'Home', icon: '⬡' },
-  { href: '/bookings', label: 'Bookings', icon: '◈' },
-  { href: '/research', label: 'Venues', icon: '🔍' },
-  { href: '/chat', label: 'AI', icon: '◎' },
-  { href: '/perfil', label: 'Profile', icon: '◉' },
+  { href: '/dashboard', label: 'Home' },
+  { href: '/bookings', label: 'Bookings' },
+  { href: '/research', label: 'Venues' },
+  { href: '/chat', label: 'AI' },
+  { href: '/perfil', label: 'Profile' },
 ]
 
 interface SidebarProps {
@@ -60,13 +60,12 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
             <Link
               href={item.href}
               className={clsx(
-                'flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all mb-0.5 w-full',
+                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-all mb-0.5 w-full',
                 pathname === item.href
                   ? 'bg-accent/10 text-accent'
                   : 'text-muted hover:bg-surface2 hover:text-white'
               )}
             >
-              <span className="text-base w-5 text-center">{item.icon}</span>
               <span className="flex-1">{item.label}</span>
               {item.badge && (
                 <span className="text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded-full">
@@ -111,7 +110,7 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
         </button>
       </div>
 
-      {/* ── MOBILE DRAWER (menú completo) ── */}
+      {/* ── MOBILE DRAWER ── */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
@@ -131,13 +130,12 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className={clsx(
-                    'flex items-center gap-2.5 px-3 py-3 rounded-lg text-sm transition-all mb-0.5 w-full',
+                    'flex items-center px-3 py-3 rounded-lg text-sm transition-all mb-0.5 w-full',
                     pathname === item.href
                       ? 'bg-accent/10 text-accent'
                       : 'text-muted hover:bg-surface2 hover:text-white'
                   )}
                 >
-                  <span className="text-base w-5 text-center">{item.icon}</span>
                   <span className="flex-1">{item.label}</span>
                   {item.badge && (
                     <span className="text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded-full">
@@ -175,12 +173,11 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
             key={item.href}
             href={item.href}
             className={clsx(
-              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all',
+              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all text-[11px]',
               pathname === item.href ? 'text-accent' : 'text-muted'
             )}
           >
-            <span className="text-xl">{item.icon}</span>
-            <span className="text-[10px]">{item.label}</span>
+            {item.label}
           </Link>
         ))}
       </nav>

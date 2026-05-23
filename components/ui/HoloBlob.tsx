@@ -9,11 +9,11 @@ export default function HoloBlob() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    if (!ctx || !canvas) return
+    if (!ctx) return
 
     let animationId: number
     let t = 0
-console.log('HoloBlob mounted', canvas.width, canvas.height)
+
     const resize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
@@ -21,79 +21,59 @@ console.log('HoloBlob mounted', canvas.width, canvas.height)
     resize()
     window.addEventListener('resize', resize)
 
-    function noise(x: number, y: number, t: number) {
-      return Math.sin(x * 1.2 + t * 0.7) * Math.cos(y * 0.9 + t * 0.5)
-           + Math.sin(x * 0.5 + y * 1.1 + t * 0.4) * 0.5
-           + Math.cos(x * 1.8 - y * 0.6 + t * 0.9) * 0.3
-    }
-
-    function getBlobPoint(angle: number, t: number) {
-      const n = noise(Math.cos(angle) * 2, Math.sin(angle) * 2, t * 0.012)
-      return 1 + n * 0.38
-    }
-
     function draw() {
       if (!ctx || !canvas) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      const cx = canvas.width * 0.62
-      const cy = canvas.height * 0.55
-      const size = Math.min(canvas.width, canvas.height) * 0.52
-      const steps = 180
+      const isMobile = canvas.width < 768
+      const cols = isMobile ? 28 : 65
+      const dotSpacingX = canvas.width / cols
+      const centerY = canvas.height * 0.5
+      const maxH = canvas.height * (isMobile ? 0.42 : 0.45)
+      const rows = isMobile ? 22 : 26
 
-      const layers = [
-        { offset: 0,    c1: 'rgba(124,95,245,0.10)', c2: 'rgba(251,113,133,0.07)', c3: 'rgba(100,200,255,0.05)' },
-        { offset: 0.3,  c1: 'rgba(251,113,133,0.08)', c2: 'rgba(180,100,255,0.06)', c3: 'rgba(100,220,200,0.04)' },
-        { offset: -0.2, c1: 'rgba(100,180,255,0.07)', c2: 'rgba(251,113,133,0.05)', c3: 'rgba(200,100,255,0.06)' },
-      ]
+      for (let col = 0; col < cols; col++) {
+        const x = col * dotSpacingX + dotSpacingX / 2
+        const phase = (col / cols) * Math.PI * 4
+        const pulse  = Math.sin(phase - t * 0.055) * 0.5 + 0.5
+        const pulse2 = Math.sin(phase * 0.6 - t * 0.035 + 1.5) * 0.35 + 0.35
+        const pulse3 = Math.sin(phase * 1.3 - t * 0.07 + 0.8) * 0.15 + 0.15
+        const height = (pulse * 0.6 + pulse2 * 0.25 + pulse3 * 0.15) * maxH
 
-      layers.forEach(({ offset, c1, c2, c3 }) => {
-        const to = t * 0.008 + offset
-        const pts: { x: number; y: number }[] = []
+        for (let row = 0; row < rows; row++) {
+          const rowY = (row / (rows - 1)) * maxH * 2
+          const dist = Math.abs(rowY - maxH)
+          if (dist > height) continue
 
-        for (let i = 0; i <= steps; i++) {
-          const angle = (i / steps) * Math.PI * 2
-          const r = getBlobPoint(angle, to * 80) * size
-          pts.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r })
+          const y = centerY - maxH + rowY
+          const proximity = 1 - dist / height
+          const dotSize = (isMobile ? 2.0 : 2.2) + proximity * (isMobile ? 2.8 : 3.2)
+
+          const hue = ((col / cols) * 0.8 + t * 0.002) % 1
+          let r = 0, g = 0, b = 0
+          if (hue < 0.33) {
+            const h = hue / 0.33
+            r = Math.round(124 + (251 - 124) * h)
+            g = Math.round(95 + (113 - 95) * h)
+            b = Math.round(245 + (133 - 245) * h)
+          } else if (hue < 0.66) {
+            const h = (hue - 0.33) / 0.33
+            r = Math.round(251 + (100 - 251) * h)
+            g = Math.round(113 + (200 - 113) * h)
+            b = Math.round(133 + (255 - 133) * h)
+          } else {
+            const h = (hue - 0.66) / 0.34
+            r = Math.round(100 + (124 - 100) * h)
+            g = Math.round(200 + (95 - 200) * h)
+            b = Math.round(255 + (245 - 255) * h)
+          }
+
+          ctx.beginPath()
+          ctx.arc(x, y, dotSize / 2, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${r},${g},${b},${0.1 + proximity * 0.55})`
+          ctx.fill()
         }
-
-        ctx.beginPath()
-        ctx.moveTo(pts[0].x, pts[0].y)
-        for (let i = 1; i < pts.length - 1; i++) {
-          const mx = (pts[i].x + pts[i + 1].x) / 2
-          const my = (pts[i].y + pts[i + 1].y) / 2
-          ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my)
-        }
-        ctx.closePath()
-
-        const grad = ctx.createRadialGradient(cx - size * 0.2, cy - size * 0.2, 0, cx, cy, size * 1.1)
-        grad.addColorStop(0, c1)
-        grad.addColorStop(0.4, c2)
-        grad.addColorStop(1, c3)
-        ctx.fillStyle = grad
-        ctx.fill()
-      })
-
-      // Sheen
-      const mainPts: { x: number; y: number }[] = []
-      for (let i = 0; i <= steps; i++) {
-        const angle = (i / steps) * Math.PI * 2
-        const r = getBlobPoint(angle, t * 0.008 * 80) * size
-        mainPts.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r })
       }
-      ctx.beginPath()
-      ctx.moveTo(mainPts[0].x, mainPts[0].y)
-      for (let i = 1; i < mainPts.length - 1; i++) {
-        const mx = (mainPts[i].x + mainPts[i + 1].x) / 2
-        const my = (mainPts[i].y + mainPts[i + 1].y) / 2
-        ctx.quadraticCurveTo(mainPts[i].x, mainPts[i].y, mx, my)
-      }
-      ctx.closePath()
-      const sheen = ctx.createRadialGradient(cx - size * 0.25, cy - size * 0.3, 0, cx - size * 0.1, cy - size * 0.1, size * 0.6)
-      sheen.addColorStop(0, `rgba(255,255,255,${0.04 + Math.sin(t * 0.02) * 0.02})`)
-      sheen.addColorStop(1, 'rgba(255,255,255,0)')
-      ctx.fillStyle = sheen
-      ctx.fill()
 
       t++
       animationId = requestAnimationFrame(draw)
@@ -111,7 +91,7 @@ console.log('HoloBlob mounted', canvas.width, canvas.height)
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none"
-style={{ zIndex: 0, opacity: 1 }}
+      style={{ zIndex: 0, opacity: 0.9 }}
     />
   )
 }

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import AppLayout from '@/components/layout/AppLayout'
 import { createClient } from '@/lib/supabase-browser'
 
@@ -9,8 +9,11 @@ export default function PerfilPage() {
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [msg, setMsg] = useState('')
   const [userId, setUserId] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [djName, setDjName] = useState('')
   const [bio, setBio] = useState('')
@@ -18,9 +21,7 @@ export default function PerfilPage() {
   const [instagram, setInstagram] = useState('')
   const [soundcloud, setSoundcloud] = useState('')
 
-  useEffect(() => {
-    loadProfile()
-  }, [])
+  useEffect(() => { loadProfile() }, [])
 
   async function loadProfile() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -34,17 +35,54 @@ export default function PerfilPage() {
       .single()
 
     if (data) {
-      setDjName(data.nombre_artistico || '')
+      setDjName(data.nombre_artistico || data.dj_name || '')
       setBio(data.bio || '')
-      setCity(data.ciudad || '')
+      setCity(data.ciudad || data.city || '')
       setInstagram(data.instagram || '')
       setSoundcloud(data.soundcloud || '')
+      setAvatarUrl(data.avatar_url || '')
     } else {
       const nombre = user.user_metadata?.nombre_artistico || user.email?.split('@')[0] || 'DJ'
       setDjName(nombre)
       await supabase.from('profiles').insert({ id: user.id, nombre_artistico: nombre })
     }
     setLoading(false)
+  }
+
+  async function uploadAvatar(file: File) {
+    if (!userId) return
+    setUploading(true)
+    setMsg('')
+
+    const ext = file.name.split('.').pop()
+    const path = `${userId}/avatar.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true })
+
+    if (uploadError) {
+      setMsg('Error uploading: ' + uploadError.message)
+      setUploading(false)
+      return
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(path)
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', userId)
+
+    if (updateError) {
+      setMsg('Error saving avatar: ' + updateError.message)
+    } else {
+      setAvatarUrl(publicUrl + '?t=' + Date.now())
+      setMsg('Avatar updated!')
+    }
+    setUploading(false)
   }
 
   async function saveProfile() {
@@ -55,8 +93,10 @@ export default function PerfilPage() {
     const { error } = await supabase.from('profiles').upsert({
       id: userId,
       nombre_artistico: djName,
+      dj_name: djName,
       bio,
       ciudad: city,
+      city,
       instagram,
       soundcloud,
     })
@@ -94,9 +134,38 @@ export default function PerfilPage() {
 
         <div className="card mb-5">
           <div className="flex items-start gap-5">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent2 to-accent flex items-center justify-center font-display text-2xl font-extrabold text-bg flex-shrink-0">
-              {(djName || 'DJ').slice(0, 2).toUpperCase()}
+
+            {/* Avatar */}
+            <div className="relative flex-shrink-0">
+              <div
+                className="w-20 h-20 rounded-full overflow-hidden cursor-pointer group"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-accent2 to-accent flex items-center justify-center font-display text-2xl font-extrabold text-bg">
+                    {(djName || 'DJ').slice(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="text-white text-xs font-medium">
+                    {uploading ? '...' : '📷'}
+                  </span>
+                </div>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) uploadAvatar(file)
+                }}
+              />
             </div>
+
             <div className="flex-1">
               {editing ? (
                 <input className="form-input text-xl font-bold mb-2" value={djName} onChange={e => setDjName(e.target.value)} placeholder="Your artist name" />
@@ -110,6 +179,7 @@ export default function PerfilPage() {
               )}
             </div>
           </div>
+
           <div className="flex gap-3 mt-5">
             {editing ? (
               <>

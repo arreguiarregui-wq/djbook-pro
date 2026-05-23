@@ -105,18 +105,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 401 })
     }
 
-    if (profile.plan === 'free' && profile.ai_credits_used >= profile.ai_credits_limit) {
-      return NextResponse.json({
-        error: 'limit_reached',
-        message: 'Has alcanzado el límite de usos gratuitos. Actualiza a Pro para uso ilimitado.',
-      }, { status: 403 })
-    }
+    // Reset mensual automático
+const lastReset = profile.ai_credits_reset_at ? new Date(profile.ai_credits_reset_at) : new Date(0)
+const now = new Date()
+const monthsSinceReset = (now.getFullYear() - lastReset.getFullYear()) * 12 + (now.getMonth() - lastReset.getMonth())
 
-    // Incrementar contador
-    await supabase
-      .from('profiles')
-      .update({ ai_credits_used: profile.ai_credits_used + 1 })
-      .eq('id', user.id)
+if (monthsSinceReset >= 1) {
+  await supabase
+    .from('profiles')
+    .update({ ai_credits_used: 0, ai_credits_reset_at: now.toISOString() })
+    .eq('id', user.id)
+  profile.ai_credits_used = 0
+}
+
+if (profile.plan === 'free' && profile.ai_credits_used >= profile.ai_credits_limit) {
+  return NextResponse.json({
+    error: 'limit_reached',
+    message: 'Has alcanzado el límite de usos gratuitos. Actualiza a Pro para uso ilimitado.',
+  }, { status: 403 })
+}
+
+// Incrementar contador
+await supabase
+  .from('profiles')
+  .update({ ai_credits_used: profile.ai_credits_used + 1 })
+  .eq('id', user.id)
 
     // Registrar uso
     await supabase.from('ai_generations').insert({

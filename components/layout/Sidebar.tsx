@@ -167,20 +167,48 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
       )}
 
       {/* ── MOBILE BOTTOM NAV ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-white/[0.08] flex items-center justify-around px-2 h-16">
-        {bottomNavItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={clsx(
-              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all text-[11px]',
-              pathname === item.href ? 'text-accent' : 'text-muted'
-            )}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+<nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-white/[0.08] flex items-center justify-around px-2 h-16">
+  {bottomNavItems.map((item) => {
+    const active = pathname === item.href
+    const glow = active ? 'drop-shadow(0 0 6px #fb7185) drop-shadow(0 0 12px rgba(251,113,133,0.5))' : 'none'
+    const color = active ? '#fb7185' : 'rgba(255,255,255,0.35)'
+
+    return (
+      <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 px-3 py-2">
+        {item.label === 'Home' && (
+          <div style={{ fontFamily: 'serif', fontWeight: 900, fontSize: 13, letterSpacing: '-0.04em', lineHeight: 1, filter: glow, color: '#fb7185', opacity: active ? 1 : 0.4 }}>
+            BeatBroker
+          </div>
+        )}
+        {item.label === 'Venues' && (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ filter: glow }}>
+            <rect x="3" y="8" width="18" height="13" rx="1" stroke={color} strokeWidth="1.5"/>
+            <path d="M7 21 L7 14 Q7 13 8 13 L11 13 Q12 13 12 14 L12 21" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+            <rect x="14" y="13" width="4" height="4" rx="0.5" stroke={color} strokeWidth="1.5"/>
+            <path d="M8 8 L12 3 L16 8" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {item.label === 'Inspiration' && (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ filter: glow }}>
+            <path d="M9 17 L9 7 L19 5 L19 15" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="7" cy="17" r="2.5" stroke={color} strokeWidth="1.5"/>
+            <circle cx="17" cy="15" r="2.5" stroke={color} strokeWidth="1.5"/>
+          </svg>
+        )}
+        {item.label === 'Chat' && (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ filter: glow }}>
+            <path d="M4 4 Q4 3 5 3 L19 3 Q20 3 20 4 L20 15 Q20 16 19 16 L8 16 L4 20 L4 4 Z" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+            <path d="M8 8 L16 8" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M8 11.5 L13 11.5" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        )}
+        <span style={{ fontSize: 10, color: active ? '#fb7185' : 'rgba(255,255,255,0.35)', filter: active ? 'drop-shadow(0 0 4px #fb7185)' : 'none' }}>
+          {item.label}
+        </span>
+      </Link>
+    )
+  })}
+</nav>
     </>
   )
 }

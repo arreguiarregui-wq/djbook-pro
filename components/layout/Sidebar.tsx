@@ -23,7 +23,7 @@ const bottomNavItems = [
   { href: '/dashboard', label: 'Home' },
   { href: '/research', label: 'Venues' },
   { href: '/inspiracion', label: 'Inspiration' },
-  { href: '/chat', label: 'Chat' },
+  { href: '/networking', label: 'Network' },
 ]
 
 interface SidebarProps {
@@ -194,7 +194,7 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
             <circle cx="17" cy="15" r="2.5" stroke={color} strokeWidth="1.5"/>
           </svg>
         )}
-        {item.label === 'Chat' && (
+        {item.label === 'Network' && (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ filter: glow }}>
             <path d="M4 4 Q4 3 5 3 L19 3 Q20 3 20 4 L20 15 Q20 16 19 16 L8 16 L4 20 L4 4 Z" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
             <path d="M8 8 L16 8" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>

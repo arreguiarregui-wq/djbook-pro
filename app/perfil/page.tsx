@@ -60,7 +60,7 @@ export default function PerfilPage() {
     const { error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(path, file, { upsert: true })
-
+console.log('Upload result:', uploadError)
     if (uploadError) {
       setMsg('Error uploading: ' + uploadError.message)
       setUploading(false)

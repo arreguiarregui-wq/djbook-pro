@@ -21,10 +21,10 @@ const navItems = [
 
 const bottomNavItems = [
   { href: '/dashboard', label: 'Home' },
-  { href: '/bookings', label: 'Bookings' },
   { href: '/research', label: 'Venues' },
-  { href: '/chat', label: 'AI' },
-  { href: '/perfil', label: 'Profile' },
+  { href: '/inspiracion', label: 'Inspiration' },
+  { href: '/chat', label: 'Chat' },
+]
 ]
 
 interface SidebarProps {

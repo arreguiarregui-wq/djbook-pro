@@ -33,7 +33,7 @@ console.log('HoloBlob mounted', canvas.width, canvas.height)
     }
 
     function draw() {
-      if (!ctx) return
+      if (!ctx || !canvas) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       const cx = canvas.width * 0.62

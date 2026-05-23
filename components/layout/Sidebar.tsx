@@ -25,7 +25,6 @@ const bottomNavItems = [
   { href: '/inspiracion', label: 'Inspiration' },
   { href: '/chat', label: 'Chat' },
 ]
-]
 
 interface SidebarProps {
   djName?: string

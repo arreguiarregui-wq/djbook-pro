@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@/lib/supabase-server'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -86,6 +87,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unknown type' }, { status: 400 })
     }
 
+    // ── BLOQUEO FREEMIUM ──
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('plan, ai_credits_used, ai_credits_limit')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile) {
+      return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 401 })
+    }
+
+    if (profile.plan === 'free' && profile.ai_credits_used >= profile.ai_credits_limit) {
+      return NextResponse.json({
+        error: 'limit_reached',
+        message: 'Has alcanzado el límite de usos gratuitos. Actualiza a Pro para uso ilimitado.',
+      }, { status: 403 })
+    }
+
+    // Incrementar contador
+    await supabase
+      .from('profiles')
+      .update({ ai_credits_used: profile.ai_credits_used + 1 })
+      .eq('id', user.id)
+
+    // Registrar uso
+    await supabase.from('ai_generations').insert({
+      user_id: user.id,
+      type,
+      input_data: data,
+    })
+
+    // ── LLAMADA A ANTHROPIC ──
     const promptFn = PROMPTS[type as keyof typeof PROMPTS]
     const content = typeof promptFn === 'function' ? promptFn(data) : ''
 
@@ -102,7 +142,6 @@ export async function POST(req: NextRequest) {
 
     const text = response.content[0].type === 'text' ? response.content[0].text : ''
 
-    // Parse JSON for research
     if (type === 'research') {
       try {
         const parsed = JSON.parse(text)

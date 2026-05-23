@@ -35,9 +35,10 @@ export default function HoloBlob() {
       for (let col = 0; col < cols; col++) {
         const x = col * dotSpacingX + dotSpacingX / 2
         const phase = (col / cols) * Math.PI * 4
-        const pulse  = Math.sin(phase - t * 0.055) * 0.5 + 0.5
-        const pulse2 = Math.sin(phase * 0.6 - t * 0.035 + 1.5) * 0.35 + 0.35
-        const pulse3 = Math.sin(phase * 1.3 - t * 0.07 + 0.8) * 0.15 + 0.15
+       const bpm = (2 * Math.PI * 125) / (60 * 60)
+const pulse  = Math.sin(phase - t * bpm) * 0.5 + 0.5
+const pulse2 = Math.sin(phase * 0.6 - t * bpm * 0.64 + 1.5) * 0.35 + 0.35
+const pulse3 = Math.sin(phase * 1.3 - t * bpm * 1.27 + 0.8) * 0.15 + 0.15
         const height = (pulse * 0.6 + pulse2 * 0.25 + pulse3 * 0.15) * maxH
 
         for (let row = 0; row < rows; row++) {

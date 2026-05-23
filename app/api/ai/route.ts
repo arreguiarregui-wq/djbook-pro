@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan, ai_credits_used, ai_credits_limit')
+      .select('plan, ai_credits_used, ai_credits_limit, ai_credits_reset_at')
       .eq('id', user.id)
       .single()
 

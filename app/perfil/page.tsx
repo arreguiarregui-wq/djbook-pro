@@ -58,7 +58,7 @@ export default function PerfilPage() {
     const path = `${userId}/avatar.${ext}`
 
     const { error: uploadError } = await supabase.storage
-      .from('AVATARS')
+      .from('avatars')
       .upload(path, file, { upsert: true })
 console.log('Upload result:', uploadError)
     if (uploadError) {
@@ -68,7 +68,7 @@ console.log('Upload result:', uploadError)
     }
 
     const { data: { publicUrl } } = supabase.storage
-      .from('AVATARS')
+      .from('avatars')
       .getPublicUrl(path)
 
     const { error: updateError } = await supabase

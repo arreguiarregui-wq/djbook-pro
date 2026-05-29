@@ -139,7 +139,10 @@ console.log('Upload result:', uploadError)
             <div className="relative flex-shrink-0">
               <div
                 className="w-20 h-20 rounded-full overflow-hidden cursor-pointer group"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => {
+  console.log('Avatar clicked, ref:', fileInputRef.current)
+  fileInputRef.current?.click()
+}}
               >
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />

@@ -35,6 +35,8 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState('')
+const [userPlan, setUserPlan] = useState(plan)
+const [userName, setUserName] = useState(djName)
 
   useEffect(() => {
     async function loadAvatar() {

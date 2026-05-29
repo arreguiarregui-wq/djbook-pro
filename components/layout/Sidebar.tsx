@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 import { clsx } from 'clsx'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', section: 'MAIN' },
@@ -34,6 +34,22 @@ interface SidebarProps {
 export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState('')
+
+  useEffect(() => {
+    async function loadAvatar() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single()
+      if (data?.avatar_url) setAvatarUrl(data.avatar_url)
+    }
+    loadAvatar()
+  }, [])
 
   const handleSignOut = async () => {
     const supabase = createClient()

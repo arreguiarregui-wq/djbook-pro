@@ -107,7 +107,7 @@ if (data?.dj_name || data?.nombre_artistico) setUserName(data.dj_name || data.no
   )}
 </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-medium text-white">{djName}</div>
+              <div className="text-xs font-medium text-white">{userName}</div>
               <div className="text-[11px] text-accent">
                 {userPlan === 'pro' ? '✦ Pro Plan' : '○ Free Plan'}
               </div>
@@ -183,7 +183,7 @@ if (data?.dj_name || data?.nombre_artistico) setUserName(data.dj_name || data.no
   )}
 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-white">{djName}</div>
+                  <div className="text-xs font-medium text-white">{userName}</div>
                   <div className="text-[11px] text-accent">
                     {userPlan === 'pro' ? '✦ Pro Plan' : '○ Free Plan'}
                   </div>

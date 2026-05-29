@@ -45,7 +45,7 @@ const [userName, setUserName] = useState(djName)
       if (!user) return
       const { data } = await supabase
         .from('profiles')
-        .select('avatar_url')
+        .select('avatar_url, plan, dj_name, nombre_artistico')
         .eq('id', user.id)
         .single()
       if (data?.avatar_url) setAvatarUrl(data.avatar_url)

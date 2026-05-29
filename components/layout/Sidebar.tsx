@@ -49,6 +49,8 @@ const [userName, setUserName] = useState(djName)
         .eq('id', user.id)
         .single()
       if (data?.avatar_url) setAvatarUrl(data.avatar_url)
+if (data?.plan) setUserPlan(data.plan)
+if (data?.dj_name || data?.nombre_artistico) setUserName(data.dj_name || data.nombre_artistico)
     }
     loadAvatar()
   }, [])

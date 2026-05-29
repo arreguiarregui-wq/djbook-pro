@@ -93,9 +93,15 @@ export default function Sidebar({ djName = 'DJ YourName', plan = 'free' }: Sideb
 
         <div className="mt-auto pt-4 border-t border-white/[0.08] space-y-2">
           <div className="bg-surface2 border border-white/[0.08] rounded-xl p-3 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent2 to-accent flex items-center justify-center text-[11px] font-bold text-bg flex-shrink-0">
-              {djName.slice(0, 2).toUpperCase()}
-            </div>
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+  {avatarUrl ? (
+    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+  ) : (
+    <div className="w-full h-full bg-gradient-to-br from-accent2 to-accent flex items-center justify-center text-[11px] font-bold text-bg">
+      {djName.slice(0, 2).toUpperCase()}
+    </div>
+  )}
+</div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-medium text-white">{djName}</div>
               <div className="text-[11px] text-accent">

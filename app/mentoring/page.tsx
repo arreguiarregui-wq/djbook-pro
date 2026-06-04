@@ -105,6 +105,7 @@ export default function MentoringPage() {
       const r = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        console.log('User ID:', user?.id)
         body: JSON.stringify({ type: 'mentoring', data: { prompt }, userId: user?.id }),
       })
       const d = await r.json()

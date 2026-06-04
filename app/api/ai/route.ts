@@ -91,15 +91,11 @@ export async function POST(req: NextRequest) {
     const supabase = createClient()
     
     // Get user from session or from userId passed in body
-    let userId = body_userId
-    if (!userId) {
-      const { data: { user } } = await supabase.auth.getUser()
-      userId = user?.id
-    }
+    const userId = body_userId
 
-    if (!userId) {
-      return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-    }
+if (!userId) {
+  return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+}
 
     const { data: profile } = await supabase
       .from('profiles')

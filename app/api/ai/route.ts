@@ -108,7 +108,8 @@ if (!userId) {
       .single()
 
     if (!profile) {
-      return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 401 })
+      console.error('Profile not found for userId:', userId)
+      return NextResponse.json({ error: 'Perfil no encontrado', userId }, { status: 401 })
     }
 
     // Reset mensual automático

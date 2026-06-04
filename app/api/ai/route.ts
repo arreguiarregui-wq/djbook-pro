@@ -81,7 +81,7 @@ Eres directo, práctico, con conocimiento real de la industria. Responde en espa
 
 export async function POST(req: NextRequest) {
   try {
-    const { type, data, history } = await req.json()
+    const { type, data, history, userId: body_userId } = await req.json()
 
     if (!PROMPTS[type as keyof typeof PROMPTS]) {
       return NextResponse.json({ error: 'Unknown type' }, { status: 400 })
@@ -89,16 +89,22 @@ export async function POST(req: NextRequest) {
 
     // ── BLOQUEO FREEMIUM ──
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    
+    // Get user from session or from userId passed in body
+    let userId = body_userId
+    if (!userId) {
+      const { data: { user } } = await supabase.auth.getUser()
+      userId = user?.id
+    }
 
-    if (!user) {
+    if (!userId) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
     }
 
     const { data: profile } = await supabase
       .from('profiles')
       .select('plan, ai_credits_used, ai_credits_limit, ai_credits_reset_at')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single()
 
     if (!profile) {

@@ -102,10 +102,10 @@ export default function MentoringPage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       const prompt = buildPrompt(profile!, djName || 'DJ', city || 'your city', years, genres, goal)
+      console.log('User ID:', user?.id)
       const r = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        console.log('User ID:', user?.id)
         body: JSON.stringify({ type: 'mentoring', data: { prompt }, userId: user?.id }),
       })
       const d = await r.json()

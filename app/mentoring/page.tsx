@@ -105,7 +105,12 @@ export default function MentoringPage() {
         body: JSON.stringify({ type: 'mentoring', data: { prompt } }),
       })
       const d = await r.json()
-      const text = (d.result || '{}').replace(/```json|```/g, '').trim()
+      if (d.error) {
+  setError(d.message || 'Error: ' + d.error)
+  setLoading(false)
+  return
+}
+const text = (d.result || '{}').replace(/```json|```/g, '').trim()
       const parsed = JSON.parse(text)
       const safePlan = {
         fase1: parsed.fase1 || { titulo: 'Month 1', objetivo: 'Build foundations', acciones: ['Action 1', 'Action 2', 'Action 3'] },

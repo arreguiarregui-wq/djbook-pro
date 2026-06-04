@@ -120,7 +120,7 @@ if (monthsSinceReset >= 1) {
   await supabase
     .from('profiles')
     .update({ ai_credits_used: 0, ai_credits_reset_at: now.toISOString() })
-    .eq('id', user.id)
+    .eq('id', userId)
   profile.ai_credits_used = 0
 }
 
@@ -135,7 +135,7 @@ if (profile.plan === 'free' && profile.ai_credits_used >= profile.ai_credits_lim
 await supabase
   .from('profiles')
   .update({ ai_credits_used: profile.ai_credits_used + 1 })
-  .eq('id', user.id)
+  .eq('id', userId)
 
     // Registrar uso
     await supabase.from('ai_generations').insert({

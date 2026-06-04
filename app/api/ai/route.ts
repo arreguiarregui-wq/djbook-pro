@@ -139,7 +139,7 @@ await supabase
 
     // Registrar uso
     await supabase.from('ai_generations').insert({
-      user_id: user.id,
+      user_id: userId,
       type,
       input_data: data,
     })

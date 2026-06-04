@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase-browser'
 import AppLayout from '@/components/layout/AppLayout'
 
 type Profile = 'beginner' | 'intermediate' | 'pro' | null
@@ -93,16 +94,18 @@ export default function MentoringPage() {
     setGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g])
   }
 
-  async function generatePlan() {
+ async function generatePlan() {
     setLoading(true)
     setError('')
     setPlan(null)
     try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
       const prompt = buildPrompt(profile!, djName || 'DJ', city || 'your city', years, genres, goal)
       const r = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'mentoring', data: { prompt } }),
+        body: JSON.stringify({ type: 'mentoring', data: { prompt }, userId: user?.id }),
       })
       const d = await r.json()
       if (d.error) {
